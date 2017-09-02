@@ -11,7 +11,7 @@ import com.blazartech.products.qotdp.data.QuoteSourceCode;
 import com.blazartech.products.qotdp.data.access.QuoteOfTheDayDAL;
 import com.blazartech.products.qotdp.process.AggregatedQuoteOfTheDay;
 import com.blazartech.products.qotdp.process.GetQuoteOfTheDayPAB;
-import java.text.SimpleDateFormat;
+import com.blazartech.products.services.date.DateServices;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -34,6 +34,9 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
 
     @Autowired
     private QuoteOfTheDayDAL dal;
+    
+    @Autowired
+    private DateServices dateServices;
 
     /**
      * Get the value of dal
@@ -54,10 +57,7 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
     }
 
     private Date getCurrentDate() {
-        Calendar c = Calendar.getInstance();
-        Date d = new Date(c.getTime().getTime());
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            return java.sql.Date.valueOf(df.format(d));
+        return dateServices.getCurrentDate();
     }
 
     /* Get a date 1 month before a specified date. */
