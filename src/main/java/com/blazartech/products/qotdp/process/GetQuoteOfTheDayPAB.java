@@ -39,4 +39,11 @@ public interface GetQuoteOfTheDayPAB {
      * @return the quote of the day data
      */
     public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(Date runDate);
+    
+    /**
+     * 
+     * @param qotd
+     * @return 
+     */
+    public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(QuoteOfTheDay qotd);
 }

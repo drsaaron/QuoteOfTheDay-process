@@ -69,7 +69,6 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
     }
 
     @Override
-    @Transactional("txManager")
     public QuoteOfTheDay getQuoteOfTheDay() {
         return getQuoteOfTheDay(getCurrentDate());
     }
@@ -122,6 +121,11 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
     @Override
     public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(Date runDate) {
         QuoteOfTheDay qotd = getQuoteOfTheDay(runDate);
+        return getAggregatedQuoteOfTheDay(qotd);
+    }
+
+    @Override
+    public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(QuoteOfTheDay qotd) {
         Quote q = dal.getQuote(qotd.getQuoteNumber());
         QuoteSourceCode sourceCode = dal.getQuoteSourceCode(q.getSourceCode());
         AggregatedQuoteOfTheDay aggQuote = new AggregatedQuoteOfTheDay();
@@ -130,5 +134,4 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
         aggQuote.setSourceCode(sourceCode);
         return aggQuote;
     }
-
 }
