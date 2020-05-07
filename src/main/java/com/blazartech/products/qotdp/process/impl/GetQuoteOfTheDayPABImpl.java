@@ -18,7 +18,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
     
-    private static final Logger logger = Logger.getLogger(GetQuoteOfTheDayPABImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GetQuoteOfTheDayPABImpl.class);
 
     @Autowired
     private QuoteOfTheDayDAL dal;
