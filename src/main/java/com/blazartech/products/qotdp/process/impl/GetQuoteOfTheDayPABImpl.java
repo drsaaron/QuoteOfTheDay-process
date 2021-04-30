@@ -95,6 +95,12 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
 
     }
 
+    public List<Quote> removeRecentQuotes(Collection<Quote> allQuotes, Collection<QuoteOfTheDay> recentQuotes) {
+        List<Quote> availableQuotes = new ArrayList<>(allQuotes);
+        recentQuotes.forEach(used -> availableQuotes.removeIf(q -> q.getNumber() == used.getQuoteNumber()));
+        return availableQuotes;
+    }
+
     @Override
     @Transactional("txManager")
     public QuoteOfTheDay getQuoteOfTheDay(Date runDate) {
@@ -106,15 +112,12 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
 
             // get all quotes
             Collection<Quote> fullQuoteCollection = dal.getUsableQuotes();
-
+            
             // get the quotes of the day from the last month.
             Collection<QuoteOfTheDay> quotesOfTheDay = dal.getQuoteOfTheDayInDateRange(getDateOneMonthBefore(runDate), runDate);
 
-            // filter out the quotes that have been used.
-            List<Quote> availableQuotes = new ArrayList<>();
-            fullQuoteCollection.stream()
-                    .filter(new AvailableQuoteFilter(quotesOfTheDay))
-                    .forEach(q -> availableQuotes.add(q));
+            // remove the quotes from availableQuotes that have been recently used
+            List<Quote> availableQuotes = removeRecentQuotes(fullQuoteCollection, quotesOfTheDay);        
             
             // shuffle the result
             Collections.shuffle(availableQuotes);
