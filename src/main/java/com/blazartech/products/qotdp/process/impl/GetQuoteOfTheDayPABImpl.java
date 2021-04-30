@@ -15,9 +15,10 @@ import com.blazartech.products.services.date.DateServices;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(GetQuoteOfTheDayPABImpl.class);
 
     @Autowired
     private QuoteOfTheDayDAL dal;
-    
+
     @Autowired
     private DateServices dateServices;
 
@@ -74,6 +75,32 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
         return getQuoteOfTheDay(getCurrentDate());
     }
 
+    /**
+     * a filter that will match true if the quote is in the recently
+     * used quotes of the day
+     */
+    private static class AvailableQuoteFilter implements Predicate<Quote> {
+
+        private final Collection<QuoteOfTheDay> usedQuotesOfDay;
+
+        public AvailableQuoteFilter(Collection<QuoteOfTheDay> usedQuotesOfDay) {
+            this.usedQuotesOfDay = usedQuotesOfDay;
+        }
+
+        @Override
+        public boolean test(Quote arg0) {
+            return !usedQuotesOfDay.stream()
+                    .anyMatch(qotd -> qotd.getQuoteNumber() == arg0.getNumber());
+        }
+
+    }
+
+    public List<Quote> removeRecentQuotes(Collection<Quote> allQuotes, Collection<QuoteOfTheDay> recentQuotes) {
+        List<Quote> availableQuotes = new ArrayList<>(allQuotes);
+        recentQuotes.forEach(used -> availableQuotes.removeIf(q -> q.getNumber() == used.getQuoteNumber()));
+        return availableQuotes;
+    }
+
     @Override
     @Transactional("txManager")
     public QuoteOfTheDay getQuoteOfTheDay(Date runDate) {
@@ -82,27 +109,22 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
         QuoteOfTheDay qotd = dal.getQuoteOfTheDay(runDate);
         if (qotd == null) {
             logger.info("don't have a quote of the day for " + runDate);
-            
-            /* Don't have one so figure out how.  Figure out how many total quotes we have.  Then
-             * generate a random number between 1 and the total number of quotes, and find that one. */
+
+            // get all quotes
             Collection<Quote> fullQuoteCollection = dal.getUsableQuotes();
-            List<Quote> fullQuotes = new ArrayList<>();
-            fullQuotes.addAll(fullQuoteCollection);
-            int quoteCount = fullQuotes.size();
-            boolean found = false;
-            Quote quote = null;
-            while (!found) {
-                Random rgen = new Random();
-                float rnum = rgen.nextFloat();
-                int n = ((int) (rnum * quoteCount));
-                quote = fullQuotes.get(n);
+            
+            // get the quotes of the day from the last month.
+            Collection<QuoteOfTheDay> quotesOfTheDay = dal.getQuoteOfTheDayInDateRange(getDateOneMonthBefore(runDate), runDate);
 
-                // check if we have used this quote recently.
-                if (dal.getQuoteOfTheDayInDateRange(quote.getNumber(), getDateOneMonthBefore(runDate), runDate).isEmpty()) {
-                    found = true;
-                }
-            }
-
+            // remove the quotes from availableQuotes that have been recently used
+            List<Quote> availableQuotes = removeRecentQuotes(fullQuoteCollection, quotesOfTheDay);        
+            
+            // shuffle the result
+            Collections.shuffle(availableQuotes);
+            
+            // return the first one
+            Quote quote = availableQuotes.get(0);
+                    
             // store this quote.
             qotd = new QuoteOfTheDay();
             qotd.setRunDate(runDate);
