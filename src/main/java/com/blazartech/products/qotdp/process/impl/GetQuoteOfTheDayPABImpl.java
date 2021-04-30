@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,26 +72,6 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
     @Override
     public QuoteOfTheDay getQuoteOfTheDay() {
         return getQuoteOfTheDay(getCurrentDate());
-    }
-
-    /**
-     * a filter that will match true if the quote is in the recently
-     * used quotes of the day
-     */
-    private static class AvailableQuoteFilter implements Predicate<Quote> {
-
-        private final Collection<QuoteOfTheDay> usedQuotesOfDay;
-
-        public AvailableQuoteFilter(Collection<QuoteOfTheDay> usedQuotesOfDay) {
-            this.usedQuotesOfDay = usedQuotesOfDay;
-        }
-
-        @Override
-        public boolean test(Quote arg0) {
-            return !usedQuotesOfDay.stream()
-                    .anyMatch(qotd -> qotd.getQuoteNumber() == arg0.getNumber());
-        }
-
     }
 
     public List<Quote> removeRecentQuotes(Collection<Quote> allQuotes, Collection<QuoteOfTheDay> recentQuotes) {
