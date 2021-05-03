@@ -25,9 +25,10 @@ import static org.mockito.Mockito.doNothing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -35,11 +36,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author scott
  */
 @ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+    GetQuoteOfTheDayConfiguration.class,
+    GetQuoteOfTheDayPABImplTest.GetQuoteOfTheDayPABImplTestConfiguration.class
+})
 public class GetQuoteOfTheDayPABImplTest {
 
     private static final Logger logger = LoggerFactory.getLogger(GetQuoteOfTheDayPABImplTest.class);
 
-    @TestConfiguration
+    @Configuration
     static class GetQuoteOfTheDayPABImplTestConfiguration {
 
         @Bean
@@ -51,6 +56,16 @@ public class GetQuoteOfTheDayPABImplTest {
         public DateServices dateServices() {
             return new DateServicesImpl();
         }
+        
+        @Bean
+        public RandomIndexGenerator indexGenerator() {
+            return new RandomIndexGeneratorImpl();
+        }
+        
+        @Bean
+        public PriorDateDetermination priorDate() {
+            return new PriorDateDeterminationImpl();
+        }
     }
 
     @Autowired
@@ -58,6 +73,12 @@ public class GetQuoteOfTheDayPABImplTest {
 
     @MockBean
     private QuoteOfTheDayDAL dal;
+    
+    @Autowired
+    private RandomIndexGenerator indexGenerator;
+    
+    @Autowired
+    private PriorDateDetermination priorDate;
 
     public GetQuoteOfTheDayPABImplTest() {
     }

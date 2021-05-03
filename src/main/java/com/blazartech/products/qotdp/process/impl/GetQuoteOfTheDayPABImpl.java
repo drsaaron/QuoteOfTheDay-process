@@ -15,12 +15,13 @@ import com.blazartech.products.services.date.DateServices;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author scott
  */
 @Service
-public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
+public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(GetQuoteOfTheDayPABImpl.class);
 
@@ -38,6 +39,9 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
 
     @Autowired
     private DateServices dateServices;
+    
+    @Autowired
+    private RandomIndexGenerator indexGenerator;
 
     /**
      * Get the value of dal
@@ -61,13 +65,8 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
         return dateServices.getCurrentDate();
     }
 
-    /* Get a date 1 month before a specified date. */
-    private Date getDateOneMonthBefore(Date d) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(d);
-        c.add(Calendar.MONTH, -1);
-        return new Date(c.getTime().getTime());
-    }
+    @Autowired
+    private PriorDateDetermination priorDate;
 
     @Override
     public QuoteOfTheDay getQuoteOfTheDay() {
@@ -80,6 +79,9 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
         return availableQuotes;
     }
 
+    @Value("${quoteOfTheDay.reuseWindowMonths:-1}")
+    private int reuseWindowMonths;
+    
     @Override
     @Transactional("txManager")
     public QuoteOfTheDay getQuoteOfTheDay(Date runDate) {
@@ -92,17 +94,21 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
             // get all quotes
             Collection<Quote> fullQuoteCollection = dal.getUsableQuotes();
             
+            // get the start date of the reuse window block
+            Date windowStart = priorDate.getPriorDate(runDate, Calendar.MONTH, reuseWindowMonths);
+            logger.info("window start date = " + windowStart);
+            
             // get the quotes of the day from the last month.
-            Collection<QuoteOfTheDay> quotesOfTheDay = dal.getQuoteOfTheDayInDateRange(getDateOneMonthBefore(runDate), runDate);
+            Collection<QuoteOfTheDay> quotesOfTheDay = dal.getQuoteOfTheDayInDateRange(windowStart, runDate);
 
             // remove the quotes from availableQuotes that have been recently used
             List<Quote> availableQuotes = removeRecentQuotes(fullQuoteCollection, quotesOfTheDay);        
             
-            // shuffle the result
-            Collections.shuffle(availableQuotes);
+            // create a random index.
+            int index = indexGenerator.randomIndex(availableQuotes.size());
             
-            // return the first one
-            Quote quote = availableQuotes.get(0);
+            // return that quote
+            Quote quote = availableQuotes.get(index);
                     
             // store this quote.
             qotd = new QuoteOfTheDay();
@@ -135,5 +141,13 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB {
         aggQuote.setQuoteOfTheDay(qotd);
         aggQuote.setSourceCode(sourceCode);
         return aggQuote;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        // sanity check that the window interval is negative
+        if (reuseWindowMonths >= 0) {
+            throw new IllegalStateException("reuseWkindowMonths must be negative");
+        }
     }
 }
