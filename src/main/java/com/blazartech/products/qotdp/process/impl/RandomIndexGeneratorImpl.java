@@ -15,12 +15,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class RandomIndexGeneratorImpl implements RandomIndexGenerator {
 
-    private final Random random = new Random();
+    private static final Random random = new Random();
     
     @Override
     public int randomIndex(int range) {
         float v = random.nextFloat();
-        return (int) v * range;
+        return (int) (v * range);
     }
     
 }
