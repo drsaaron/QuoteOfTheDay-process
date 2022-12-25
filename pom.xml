@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.blazartech</groupId>
     <artifactId>QuoteOfTheDay-process</artifactId>
-    <version>1.32-RELEASE</version>
+    <version>1.34-RELEASE</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>com.blazartech</groupId>
             <artifactId>QuoteOfTheDay-data</artifactId>
-            <version>1.32-RELEASE</version>
+            <version>1.33-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>com.blazartech</groupId>
             <artifactId>DateServices</artifactId>
-            <version>1.23-RELEASE</version>
+            <version>1.25-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
