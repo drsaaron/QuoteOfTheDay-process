@@ -72,4 +72,20 @@
 
     </dependencies>
     <name>QuoteOfTheDay-process</name>
+
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <name>my nexus</name>
+            <url>http://localhost:8081/repository/maven-releases/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <url>http://localhost:8081/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
 </project>
