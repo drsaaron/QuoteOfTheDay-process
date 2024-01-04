@@ -112,7 +112,7 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
                     
             // store this quote.
             qotd = new QuoteOfTheDay();
-            qotd.setRunDate(runDate);
+            qotd.setRunDate(dateServices.convertDateToLocalDate(runDate));
             qotd.setQuoteNumber(quote.getNumber());
             dal.addQuoteOfTheDay(qotd);
         }

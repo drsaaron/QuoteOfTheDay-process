@@ -10,6 +10,7 @@ import com.blazartech.products.qotdp.data.QuoteOfTheDay;
 import com.blazartech.products.qotdp.data.access.QuoteOfTheDayDAL;
 import com.blazartech.products.services.date.DateServices;
 import com.blazartech.products.services.date.impl.DateServicesImpl;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -111,12 +112,12 @@ public class GetQuoteOfTheDayPABImplTest {
         QuoteOfTheDay qotd1 = new QuoteOfTheDay();
         qotd1.setNumber(1);
         qotd1.setQuoteNumber(1);
-        qotd1.setRunDate(new Date());
+        qotd1.setRunDate(LocalDate.now());
 
         QuoteOfTheDay qotd2 = new QuoteOfTheDay();
         qotd2.setNumber(2);
         qotd2.setQuoteNumber(3);
-        qotd2.setRunDate(new Date());
+        qotd2.setRunDate(LocalDate.now());
 
         USED_QUOTES = List.of(qotd1, qotd2);
     }
