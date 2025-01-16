@@ -72,7 +72,7 @@ public class GetQuoteOfTheDayPABImplTest {
     @Autowired
     private GetQuoteOfTheDayPABImpl instance;
 
-    @MockBean
+    @MockitoBean
     private QuoteOfTheDayDAL dal;
     
     @Autowired
