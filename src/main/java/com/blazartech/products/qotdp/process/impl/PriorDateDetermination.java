@@ -5,7 +5,7 @@
  */
 package com.blazartech.products.qotdp.process.impl;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  *
@@ -17,7 +17,9 @@ public interface PriorDateDetermination {
      * get a prior date, <em>e.g.</em> a date one month prior.
      * 
      * @param d
+     * @param calendarType
+     * @param interval
      * @return 
      */
-    Date getPriorDate(Date d, int calendarType, int interval);
+    LocalDate getPriorDate(LocalDate d, int calendarType, int interval);
 }

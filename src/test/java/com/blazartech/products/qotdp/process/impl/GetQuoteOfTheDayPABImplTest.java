@@ -131,8 +131,8 @@ public class GetQuoteOfTheDayPABImplTest {
 
         Mockito.when(dal.getAllQuotes()).thenReturn(AVAILABLE_QUOTES);
         Mockito.when(dal.getUsableQuotes()).thenReturn(AVAILABLE_QUOTES);
-        Mockito.when(dal.getQuoteOfTheDay(Mockito.any(Date.class))).thenReturn(null);
-        Mockito.when(dal.getQuoteOfTheDayInDateRange(Mockito.any(Date.class), Mockito.any(Date.class))).thenReturn(USED_QUOTES);
+        Mockito.when(dal.getQuoteOfTheDay(Mockito.any(LocalDate.class))).thenReturn(null);
+        Mockito.when(dal.getQuoteOfTheDayInDateRange(Mockito.any(LocalDate.class), Mockito.any(LocalDate.class))).thenReturn(USED_QUOTES);
         doNothing().when(dal).addQuoteOfTheDay(Mockito.any(QuoteOfTheDay.class));
     }
 
@@ -172,7 +172,7 @@ public class GetQuoteOfTheDayPABImplTest {
     public void testGetQuoteOfTheDay() {
         logger.info("getQuoteOfTheDay");
 
-        QuoteOfTheDay qotd = instance.getQuoteOfTheDay(new Date());
+        QuoteOfTheDay qotd = instance.getQuoteOfTheDay(LocalDate.now());
 
         assertNotNull(qotd);
         assertEquals(2, qotd.getQuoteNumber());

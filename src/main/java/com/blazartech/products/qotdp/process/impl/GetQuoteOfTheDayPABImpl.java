@@ -12,10 +12,10 @@ import com.blazartech.products.qotdp.data.access.QuoteOfTheDayDAL;
 import com.blazartech.products.qotdp.process.AggregatedQuoteOfTheDay;
 import com.blazartech.products.qotdp.process.GetQuoteOfTheDayPAB;
 import com.blazartech.products.services.date.DateServices;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +61,8 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
         this.dal = dal;
     }
 
-    private Date getCurrentDate() {
-        return dateServices.getCurrentDate();
+    private LocalDate getCurrentDate() {
+        return dateServices.getCurrentLocalDate();
     }
 
     @Autowired
@@ -79,12 +79,12 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
         return availableQuotes;
     }
 
-    @Value("${quoteOfTheDay.reuseWindowMonths:-1}")
+    @Value("${quoteOfTheDay.reuseWindowMonths:1}")
     private int reuseWindowMonths;
     
     @Override
     @Transactional("txManager")
-    public QuoteOfTheDay getQuoteOfTheDay(Date runDate) {
+    public QuoteOfTheDay getQuoteOfTheDay(LocalDate runDate) {
 
         // do we already have a quote for today?
         QuoteOfTheDay qotd = dal.getQuoteOfTheDay(runDate);
@@ -95,7 +95,7 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
             Collection<Quote> fullQuoteCollection = dal.getUsableQuotes();
             
             // get the start date of the reuse window block
-            Date windowStart = priorDate.getPriorDate(runDate, Calendar.MONTH, reuseWindowMonths);
+            LocalDate windowStart = priorDate.getPriorDate(runDate, Calendar.MONTH, reuseWindowMonths);
             logger.info("window start date = " + windowStart);
             
             // get the quotes of the day from the last month.
@@ -112,7 +112,7 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
                     
             // store this quote.
             qotd = new QuoteOfTheDay();
-            qotd.setRunDate(dateServices.convertDateToLocalDate(runDate));
+            qotd.setRunDate(runDate);
             qotd.setQuoteNumber(quote.getNumber());
             dal.addQuoteOfTheDay(qotd);
         }
@@ -127,7 +127,7 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
     }
 
     @Override
-    public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(Date runDate) {
+    public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(LocalDate runDate) {
         QuoteOfTheDay qotd = getQuoteOfTheDay(runDate);
         return getAggregatedQuoteOfTheDay(qotd);
     }
@@ -145,9 +145,9 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // sanity check that the window interval is negative
-        if (reuseWindowMonths >= 0) {
-            throw new IllegalStateException("reuseWkindowMonths must be negative");
+        // sanity check that the window interval is positive
+        if (reuseWindowMonths <= 0) {
+            throw new IllegalStateException("reuseWkindowMonths must be positive");
         }
     }
 }

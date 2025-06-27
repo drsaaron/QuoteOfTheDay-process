@@ -6,7 +6,7 @@
 package com.blazartech.products.qotdp.process;
 
 import com.blazartech.products.qotdp.data.QuoteOfTheDay;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  *
@@ -25,7 +25,7 @@ public interface GetQuoteOfTheDayPAB {
      * @param runDate effective date
      * @return
      */
-    public QuoteOfTheDay getQuoteOfTheDay(Date runDate);
+    public QuoteOfTheDay getQuoteOfTheDay(LocalDate runDate);
 
     /**
      * get all the quote information for a quote of the day.
@@ -38,7 +38,7 @@ public interface GetQuoteOfTheDayPAB {
      * @param runDate effective date
      * @return the quote of the day data
      */
-    public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(Date runDate);
+    public AggregatedQuoteOfTheDay getAggregatedQuoteOfTheDay(LocalDate runDate);
     
     /**
      * 

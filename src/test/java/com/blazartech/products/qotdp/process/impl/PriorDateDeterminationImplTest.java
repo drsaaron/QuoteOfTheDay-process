@@ -5,10 +5,11 @@
  */
 package com.blazartech.products.qotdp.process.impl;
 
+import com.blazartech.products.services.date.DateServices;
+import com.blazartech.products.services.date.impl.DateServicesImpl;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
-import java.util.Date;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,11 @@ public class PriorDateDeterminationImplTest {
         public PriorDateDeterminationImpl instance() {
             return new PriorDateDeterminationImpl();
         }
+        
+        @Bean
+        public DateServices dateServices() {
+            return new DateServicesImpl();
+        }
     }
     
     @Autowired
@@ -63,9 +69,8 @@ public class PriorDateDeterminationImplTest {
     public void tearDown() {
     }
 
-    private Date parseDate(String d) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.parse(d);
+    private LocalDate parseDate(String d) throws ParseException {
+        return LocalDate.parse(d);
     }
     
     /**
@@ -75,10 +80,10 @@ public class PriorDateDeterminationImplTest {
     public void testGetPriorDate_1Month() throws ParseException {
         logger.info("getPriorDate_1Month");
 
-        Date d = parseDate("2021-04-30");
-        Date expResult = parseDate("2021-05-30");
+        LocalDate d = parseDate("2021-04-30");
+        LocalDate expResult = parseDate("2021-03-30");
         
-        Date result = instance.getPriorDate(d, Calendar.MONTH, 1);
+        LocalDate result = instance.getPriorDate(d, Calendar.MONTH, 1);
         assertEquals(expResult, result);
     }
     
@@ -86,10 +91,10 @@ public class PriorDateDeterminationImplTest {
     public void testGetPriorDate_30Days() throws ParseException {
         logger.info("getPriorDate_30Days");
 
-        Date d = parseDate("2021-04-30");
-        Date expResult = parseDate("2021-03-31");
+        LocalDate d = parseDate("2021-04-30");
+        LocalDate expResult = parseDate("2021-03-31");
         
-        Date result = instance.getPriorDate(d, Calendar.DATE, -30);
+        LocalDate result = instance.getPriorDate(d, Calendar.DATE, 30);
         assertEquals(expResult, result);
     }
     
@@ -97,10 +102,10 @@ public class PriorDateDeterminationImplTest {
     public void testGetPriorDate_60Days() throws ParseException {
         logger.info("getPriorDate_60Days");
 
-        Date d = parseDate("2021-09-1");
-        Date expResult = parseDate("2021-07-01");
+        LocalDate d = parseDate("2021-09-01");
+        LocalDate expResult = parseDate("2021-07-01");
         
-        Date result = instance.getPriorDate(d, Calendar.DATE, -62);
+        LocalDate result = instance.getPriorDate(d, Calendar.DATE, 62);
         assertEquals(expResult, result);
     }
 }
