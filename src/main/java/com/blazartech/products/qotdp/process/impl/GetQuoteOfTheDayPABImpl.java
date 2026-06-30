@@ -83,7 +83,7 @@ public class GetQuoteOfTheDayPABImpl implements GetQuoteOfTheDayPAB, Initializin
     private int reuseWindowMonths;
     
     @Override
-    @Transactional("txManager")
+    @Transactional("qotdTransactionManager")
     public QuoteOfTheDay getQuoteOfTheDay(LocalDate runDate) {
 
         // do we already have a quote for today?
