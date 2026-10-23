@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.blazartech</groupId>
     <artifactId>QuoteOfTheDay-process</artifactId>
-    <version>1.77-RELEASE</version>
+    <version>1.78-RELEASE</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,19 +13,19 @@
     <parent>  
         <groupId>com.blazartech</groupId>           
         <artifactId>blazarjavaparent</artifactId>           
-        <version>1.29-RELEASE</version>     
+        <version>1.30-RELEASE</version>     
     </parent> 
         
     <dependencies>
         <dependency>
             <groupId>com.blazartech</groupId>
             <artifactId>QuoteOfTheDay-data</artifactId>
-            <version>1.78-RELEASE</version>
+            <version>1.79-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>com.blazartech</groupId>
             <artifactId>DateServices</artifactId>
-            <version>1.65-RELEASE</version>
+            <version>1.66-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
